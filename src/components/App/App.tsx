@@ -1,4 +1,6 @@
 import { useState } from "react";
+
+import toast, { Toaster } from "react-hot-toast";
 import type { Movie } from "../../types/movie";
 import { fetchMovies } from "../../services/movieService";
 
@@ -13,14 +15,21 @@ import MovieModal from "../MovieModal/MovieModal";
 export default function App() {
   // STATE
   const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [movie, setMovie] = useState<number>(0);
 
+  // MODAL FUNCTION
+
   function isActive(): void {
     setIsOpen((prev) => !prev);
+  }
+
+  function onSelect(id: number): void {
+    setMovie(id);
+    isActive();
   }
 
   // SEARCH
@@ -29,14 +38,15 @@ export default function App() {
       setIsLoading(true);
       setIsError(false);
       setMovies([]);
-      // 2. Використовуємо HTTP-функцію
+
       const data = await fetchMovies(search);
       setMovies(data);
 
       if (!data || data.length === 0) {
-        setIsError(true);
+        toast.error("No movies found.");
       }
     } catch (error) {
+      setIsError(true);
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -46,12 +56,11 @@ export default function App() {
   // BODY
   return (
     <div className={styles.app}>
-      <SearchBar onSubmit={handleSearch} isError={isError} />
+      <Toaster position="top-center" reverseOrder={false} />
+      <SearchBar onSubmit={handleSearch} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movies && (
-        <MovieGrid movies={movies} open={isActive} setMovie={setMovie} />
-      )}
+      {movies && <MovieGrid movies={movies} onSelect={onSelect} />}
       {isOpen && (
         <MovieModal onClose={isActive} movies={movies} movie={movie} />
       )}

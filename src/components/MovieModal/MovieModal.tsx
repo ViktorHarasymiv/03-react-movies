@@ -1,13 +1,41 @@
+import { useEffect } from "react";
+
 import css from "./MovieModal.module.css";
 import type { Movie } from "../../types/movie";
 
-interface MoviesProps {
+interface MovieModalProps {
   onClose: () => void;
   movies: Movie[];
   movie: number;
 }
 
-export default function MovieModal({ onClose, movies, movie }: MoviesProps) {
+export default function MovieModal({
+  onClose,
+  movie,
+  movies,
+}: MovieModalProps) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "auto";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
   const selectedMovie = movies.find((elem) => elem.id === movie);
 
   if (!selectedMovie) {
@@ -15,7 +43,12 @@ export default function MovieModal({ onClose, movies, movie }: MoviesProps) {
   }
 
   return (
-    <div className={css.backdrop} role="dialog" aria-modal="true">
+    <div
+      onClick={handleOverlayClick}
+      className={css.backdrop}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className={css.modal}>
         <button
           onClick={onClose}
