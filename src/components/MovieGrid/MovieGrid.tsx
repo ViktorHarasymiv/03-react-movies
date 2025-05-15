@@ -3,29 +3,29 @@ import type { Movie } from "../../types/movie";
 
 interface MovieGridProps {
   movies: Movie[];
-  onSelect: (id: number) => void;
+  onSelect: (item: Movie) => void;
 }
 
 export default function MovieGrid({ movies, onSelect }: MovieGridProps) {
   return (
     <ul className={style.grid}>
       {/* Набір елементів списку з фільмами */}
-      {movies.map((movie) => {
+      {movies.map((item) => {
         return (
           <li
             onClick={() => {
-              onSelect(movie.id);
+              onSelect(item);
             }}
-            key={movie.id}
+            key={item.id}
           >
             <div className={style.card}>
               <img
                 className={style.image}
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
                 alt="movie title"
                 loading="lazy"
               />
-              <h2 className={style.title}>{movie.title}</h2>
+              <h2 className={style.title}>{item.title}</h2>
             </div>
           </li>
         );

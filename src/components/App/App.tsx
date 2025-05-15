@@ -14,12 +14,20 @@ import MovieModal from "../MovieModal/MovieModal";
 
 export default function App() {
   // STATE
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [movie, setMovie] = useState<number>(0);
+  const [movie, setMovie] = useState<Movie>({
+    id: 0,
+    poster_path: "",
+    backdrop_path: "",
+    title: "",
+    overview: "",
+    release_date: "",
+    vote_average: 0,
+  });
 
   // MODAL FUNCTION
 
@@ -27,13 +35,13 @@ export default function App() {
     setIsOpen((prev) => !prev);
   }
 
-  function onSelect(id: number): void {
-    setMovie(id);
+  function onSelect(params: Movie): void {
+    setMovie(params);
     isActive();
   }
 
   // SEARCH
-  const handleSearch = async (search: string) => {
+  const handleSearch = async (search: string): Promise<void> => {
     try {
       setIsLoading(true);
       setIsError(false);
@@ -60,10 +68,8 @@ export default function App() {
       <SearchBar onSubmit={handleSearch} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movies && <MovieGrid movies={movies} onSelect={onSelect} />}
-      {isOpen && (
-        <MovieModal onClose={isActive} movies={movies} movie={movie} />
-      )}
+      {movies != undefined && <MovieGrid movies={movies} onSelect={onSelect} />}
+      {isOpen && <MovieModal onClose={isActive} movie={movie} />}
     </div>
   );
 }
